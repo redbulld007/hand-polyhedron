@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { getViews } from './shared/sab-layout';
 import { OFF } from './shared/sab-layout';
-import { HandSkeleton } from './components/HandSkeleton';
 
 export default function App({ sab }: { sab: SharedArrayBuffer }) {
   const [status, setStatus] = useState('正在初始化...');
   const [pinchBar, setPinchBar] = useState(0);
   const [lighting, setLighting] = useState(0.5);
+  const [error, setError] = useState('');
   const frameRef = useRef(0);
 
   useEffect(() => {
@@ -29,6 +29,8 @@ export default function App({ sab }: { sab: SharedArrayBuffer }) {
 
         setPinchBar(pinching ? Math.max(5, (1 - f32[OFF.PINCH_DISTANCE] / 0.15) * 100) : 0);
         setLighting(f32[OFF.LIGHTING_SCORE] || 0.5);
+
+        if (i32[OFF.ERROR_CODE] === 1) setError('初始化失败：无法加载手势识别模型，请检查网络连接');
       }
       raf = requestAnimationFrame(poll);
     }
@@ -38,11 +40,15 @@ export default function App({ sab }: { sab: SharedArrayBuffer }) {
 
   return (
     <>
-      <HandSkeleton sab={sab} />
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 10, pointerEvents: 'none', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ textAlign: 'center', padding: '16px', color: '#ffffffcc', fontSize: '14px', letterSpacing: '1px', background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%)' }}>
         {status}
       </div>
+      {error && (
+        <div style={{ textAlign: 'center', padding: '12px 16px', color: '#ff4444', fontSize: '14px', background: 'rgba(255,0,0,0.15)', margin: '0 16px', borderRadius: '8px' }}>
+          {error}
+        </div>
+      )}
       {lighting < 0.3 && (
         <div style={{ textAlign: 'center', padding: '8px', color: '#ffaa00', fontSize: '13px', background: 'rgba(0,0,0,0.5)' }}>
           光线较暗，请补充面部光照以获得更好的追踪效果

@@ -1,22 +1,14 @@
 // Tracking Worker: MediaPipe Hands + Kalman + Occlusion + Gesture
 import { GestureRecognizer, FilesetResolver } from '@mediapipe/tasks-vision';
 import type { NormalizedLandmark } from '@mediapipe/tasks-vision';
-import { KalmanFilter6D } from '../shared/kalman-filter';
 import { OFF, SAB_MAGIC, getViews } from '../shared/sab-layout';
-import { PINCH_THRESHOLD, SNAP_COOLDOWN_MS, KALMAN_MAX_PREDICT_FRAMES } from '../shared/constants';
+import { PINCH_THRESHOLD, SNAP_COOLDOWN_MS } from '../shared/constants';
 
 let sab: SharedArrayBuffer;
 let i32: Int32Array;
 let f32: Float32Array;
 let recognizer: GestureRecognizer | null = null;
 let frameId = 0;
-
-const kfLeft = new KalmanFilter6D(1e-3, 5e-3);
-const kfRight = new KalmanFilter6D(1e-3, 5e-3);
-
-interface HandRecord { id: number; handedness: 'Left' | 'Right'; predictCount: number; lastSeen: number; }
-const handRecords = new Map<number, HandRecord>();
-let nextHandId = 1;
 
 let snapDistHistory: number[] = [];
 let lastSnapTime = 0;
@@ -32,16 +24,17 @@ function sDist(lm: NormalizedLandmark[]): number {
 
 async function initRecognizer(): Promise<void> {
   const vision = await FilesetResolver.forVisionTasks(
-    'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.18/wasm'
+    '/wasm'
   );
   recognizer = await GestureRecognizer.createFromOptions(vision, {
     baseOptions: {
-      modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/latest/gesture_recognizer.task',
+      modelAssetPath: '/wasm/gesture_recognizer.task',
       delegate: 'GPU',
     },
     numHands: 2,
     runningMode: 'VIDEO',
   });
+  console.log('[TrackingWorker] MediaPipe initialized successfully');
 }
 
 function processFrame(videoFrame: VideoFrame): void {
@@ -89,26 +82,13 @@ function processFrame(videoFrame: VideoFrame): void {
   i32[OFF.FRAME_ID] = frameId;
 }
 
-function writeHand(idx: 0 | 1, lm: NormalizedLandmark[] | null, handedness: 'Left' | 'Right', now: number): void {
-  const kf = handedness === 'Left' ? kfLeft : kfRight;
+function writeHand(idx: 0 | 1, lm: NormalizedLandmark[] | null, _handedness: 'Left' | 'Right', _now: number): void {
   const base = idx === 0 ? OFF.HAND0_X : OFF.HAND1_X;
-
   if (lm) {
-    const existing = [...handRecords.values()].find(h => h.handedness === handedness);
-    const hid = existing?.id ?? nextHandId++;
-    handRecords.set(hid, { id: hid, handedness, predictCount: 0, lastSeen: now });
     for (let i = 0; i < 21; i++) {
-      const [sx, sy, sz] = kf.update(lm[i].x, lm[i].y, lm[i].z);
-      f32[base + i * 3] = sx; f32[base + i * 3 + 1] = sy; f32[base + i * 3 + 2] = sz;
-    }
-  } else {
-    const existing = [...handRecords.values()].find(h => h.handedness === handedness);
-    if (existing && existing.predictCount < KALMAN_MAX_PREDICT_FRAMES) {
-      existing.predictCount++;
-      const [px, py, pz] = kf.predict();
-      for (let i = 0; i < 21; i++) {
-        f32[base + i * 3] = px; f32[base + i * 3 + 1] = py; f32[base + i * 3 + 2] = pz;
-      }
+      f32[base + i * 3] = lm[i].x;
+      f32[base + i * 3 + 1] = lm[i].y;
+      f32[base + i * 3 + 2] = lm[i].z;
     }
   }
 }
@@ -132,12 +112,18 @@ function detectSnap(lm: NormalizedLandmark[], now: number): void {
 
 self.onmessage = async (e: MessageEvent) => {
   if (e.data.type === 'init') {
-    sab = e.data.sab;
-    const v = getViews(sab);
-    i32 = v.i32; f32 = v.f32;
-    i32[OFF.MAGIC] = SAB_MAGIC;
-    await initRecognizer();
-    self.postMessage({ type: 'ready' });
+    try {
+      sab = e.data.sab;
+      const v = getViews(sab);
+      i32 = v.i32; f32 = v.f32;
+      i32[OFF.MAGIC] = SAB_MAGIC;
+      await initRecognizer();
+      self.postMessage({ type: 'ready' });
+    } catch (err: any) {
+      console.error('[TrackingWorker] Init failed:', err?.message || err);
+      i32[OFF.ERROR_CODE] = 1;
+      self.postMessage({ type: 'error', message: err?.message || String(err) });
+    }
   } else if (e.data.type === 'frame') {
     processFrame(e.data.videoFrame);
     e.data.videoFrame.close();

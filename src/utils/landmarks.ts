@@ -76,3 +76,22 @@ export function getSnapDistance(landmarks: Landmark[]): number {
   const thumb = landmarks[LANDMARK.THUMB_TIP];
   return Math.hypot(middle.x - thumb.x, middle.y - thumb.y, middle.z - thumb.z);
 }
+
+/** 手部三角网格面定义 - 用于建模线风格渲染 */
+export const HAND_MESH_TRIANGLES: [number, number, number][] = [
+  // Palm
+  [0, 1, 5],   [0, 5, 9],   [0, 9, 13],   [0, 13, 17],
+  [1, 2, 5],   [2, 5, 9],
+  [5, 9, 6],   [9, 13, 10],  [13, 17, 14],
+  [5, 6, 9],   [9, 10, 13],  [13, 14, 17],
+  // Thumb
+  [1, 2, 3],   [2, 3, 4],
+  // Index
+  [5, 6, 7],   [6, 7, 8],
+  // Middle
+  [9, 10, 11], [10, 11, 12],
+  // Ring
+  [13, 14, 15], [14, 15, 16],
+  // Pinky
+  [17, 18, 19], [18, 19, 20],
+];

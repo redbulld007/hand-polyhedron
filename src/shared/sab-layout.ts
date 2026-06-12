@@ -19,6 +19,7 @@ export const OFF = {
   SNAP_TRIGGERED: 137,
   COLOR_INDEX: 138,
   LIGHTING_SCORE: 139,
+  ERROR_CODE: 140,      // 0=OK, 1=init_failed
 } as const;
 
 export function createSAB(): SharedArrayBuffer {

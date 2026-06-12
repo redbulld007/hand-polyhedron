@@ -2,13 +2,17 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './App.css';
 import { createSAB } from './shared/sab-layout';
-import TrackingWorker from './workers/tracking.worker.ts?worker';
-import RenderWorker from './workers/render.worker.ts?worker';
 
 const sab = createSAB();
 
-const trackingWorker = new TrackingWorker();
-const renderWorker = new RenderWorker();
+const trackingWorker = new Worker(
+  new URL('./workers/tracking.worker.ts', import.meta.url),
+  { type: 'module' }
+);
+const renderWorker = new Worker(
+  new URL('./workers/render.worker.ts', import.meta.url),
+  { type: 'module' }
+);
 trackingWorker.postMessage({ type: 'init', sab });
 
 const renderCanvas = document.createElement('canvas');
@@ -33,6 +37,8 @@ async function startCamera(): Promise<void> {
     video.srcObject = stream;
     video.playsInline = true;
     video.muted = true;
+    video.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;transform:scaleX(-1);';
+    document.body.appendChild(video);
     await video.play();
 
     function processVideoFrame(_now: number, metadata: VideoFrameCallbackMetadata) {
