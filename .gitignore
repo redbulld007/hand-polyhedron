@@ -25,3 +25,7 @@ dist-ssr
 
 # Claude local state
 .claude/
+
+# MediaPipe WASM binaries (too large for Git)
+public/wasm/*.wasm
+public/wasm/*.task
