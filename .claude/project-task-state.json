@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-06-12T04:27:35.464001Z",
-  "updated_at": "2026-06-12T04:47:57.407169Z",
+  "updated_at": "2026-06-12T05:39:48.386981Z",
   "sessions": [
     {
       "session_id": "unknown",
@@ -107,6 +107,101 @@
       "remaining_tasks": [
         {
           "description": "pending",
+          "status": "pending"
+        }
+      ],
+      "note": "auto-save from Stop hook, 400 transcript lines"
+    },
+    {
+      "session_id": "unknown",
+      "date": "2026-06-12",
+      "started_at": "2026-06-12T05:23:26.591856Z",
+      "current_task": "",
+      "completed_tasks": [
+        {
+          "description": "completed\",\"taskId\":\"11\"}}],\"stop_reason\":\"tool_use\",\"stop_sequence\":null,\"usage",
+          "completed_at": "2026-06-12T05:23:26.591856Z"
+        }
+      ],
+      "remaining_tasks": [
+        {
+          "description": "pending",
+          "status": "pending"
+        }
+      ],
+      "note": "auto-save from Stop hook, 400 transcript lines"
+    },
+    {
+      "session_id": "unknown",
+      "date": "2026-06-12",
+      "started_at": "2026-06-12T05:29:37.017403Z",
+      "current_task": "",
+      "completed_tasks": [
+        {
+          "description": "completed\",\"taskId\":\"11\"}}],\"stop_reason\":\"tool_use\",\"stop_sequence\":null,\"usage",
+          "completed_at": "2026-06-12T05:29:37.017403Z"
+        }
+      ],
+      "remaining_tasks": [
+        {
+          "description": "pending",
+          "status": "pending"
+        }
+      ],
+      "note": "auto-save from Stop hook, 400 transcript lines"
+    },
+    {
+      "session_id": "unknown",
+      "date": "2026-06-12",
+      "started_at": "2026-06-12T05:32:07.346420Z",
+      "current_task": "",
+      "completed_tasks": [
+        {
+          "description": "completed\"},\"verificationNudgeNeeded\":false},\"sourceToolAssistantUUID\":\"90966e29",
+          "completed_at": "2026-06-12T05:32:07.346420Z"
+        }
+      ],
+      "remaining_tasks": [
+        {
+          "description": "pending",
+          "status": "pending"
+        }
+      ],
+      "note": "auto-save from Stop hook, 400 transcript lines"
+    },
+    {
+      "session_id": "unknown",
+      "date": "2026-06-12",
+      "started_at": "2026-06-12T05:38:08.907421Z",
+      "current_task": "",
+      "completed_tasks": [
+        {
+          "description": "completed\"},\"verificationNudgeNeeded\":false},\"sourceToolAssistantUUID\":\"90966e29",
+          "completed_at": "2026-06-12T05:38:08.907421Z"
+        }
+      ],
+      "remaining_tasks": [
+        {
+          "description": "Pending",
+          "status": "pending"
+        }
+      ],
+      "note": "auto-save from Stop hook, 400 transcript lines"
+    },
+    {
+      "session_id": "unknown",
+      "date": "2026-06-12",
+      "started_at": "2026-06-12T05:39:48.386981Z",
+      "current_task": "",
+      "completed_tasks": [
+        {
+          "description": "completed\"},\"verificationNudgeNeeded\":false},\"sourceToolAssistantUUID\":\"90966e29",
+          "completed_at": "2026-06-12T05:39:48.386981Z"
+        }
+      ],
+      "remaining_tasks": [
+        {
+          "description": "Pending",
           "status": "pending"
         }
       ],
